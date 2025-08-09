@@ -3,16 +3,16 @@ const request = require("request");
 const {
   Intents,
   Client,
-  MessageActionRow,//使用してません
-  MessageButton,//使用してません
+  MessageActionRow,//Not used
+  MessageButton,//Not used
   ClientApplication,
 } = require("discord.js");
 const options = {
   intents: [
     "GUILDS",
     "GUILD_MESSAGES",
-    "GUILD_MESSAGE_REACTIONS",//使用してません
-    "GUILD_VOICE_STATES",//使用してません
+  "GUILD_MESSAGE_REACTIONS",//Not used
+  "GUILD_VOICE_STATES",//Not used
     "GUILD_WEBHOOKS",
   ],
 };
@@ -20,16 +20,16 @@ const cacheWebhooks = new Map();
 const commands = [
     {
       name: "ping",
-      description: "ping値を返します。",
+  description: "Returns the ping value.",
     },
     {
       name: "automatictranslation",
-      description: "コマンドが送信されたチャンネルで自動翻訳を開始/停止します。",
+  description: "Start/stop automatic translation in the channel where the command is sent.",
     },
   ];
 const fs = require("fs");
 const client = new Discord.Client(options);
-const prefix = "";//prefix自分で入れてね
+const prefix = "";//Set your own prefix here
 const fetch = require("node-fetch");
 const cash = new Object();
 const trmsgid = new Object();
@@ -38,7 +38,7 @@ var settings = require("./settings.json");
 cash.trst = settings.trst
 cash.msgch = settings.msgch
 client.on("ready", async () => {
-  console.log(client.user.tag + "にログインしました");
+  console.log(client.user.tag + " has logged in");
   client.user.setPresence({
     status: "online",
   });
@@ -46,14 +46,14 @@ client.on("ready", async () => {
     `ver ${packagejson.version} | d.js : ${packagejson.dependencies["discord.js"].replace("^", "")},wake up time : ${Date.now()}`,
     { type: "PLAYING" }
   );
-  await client.application.commands.set(commands);//スラッシュコマンドの登録
+  await client.application.commands.set(commands);//Register slash commands
 });
 
 client.on("messageCreate", async (message) => {
   var args = message.content.slice(prefix.length).trim().split(/ +/g);
   var command = args.shift().toLowerCase();
-  if(message.author.bot) return;//botのメッセージに反応しない。消してもいいけど永遠に翻訳ループする可能性があるので注意
-  if (command === 'tr') { //コマンドで手動翻訳
+  if(message.author.bot) return;//Do not respond to bot messages. You can remove this, but beware of infinite translation loops.
+  if (command === 'tr') { //Manual translation by command
      var target = encodeURIComponent(args[0])
      var text = encodeURIComponent(message.content.replace(args[0],"").replace(prefix+"tr",""))
      var content = await fetch(`https://script.google.com/macros/s/AKfycbyZzeACcCpM2PNgoYN1jg64CTzZcXCx-xYHp9WC6yNQYdrCmyYcER-_vR8A-D2Epvok_w/exec?text=${text}&source=&target=${target}`).then(res => res.text())
@@ -73,7 +73,7 @@ client.on("messageCreate", async (message) => {
   }
     if(command==="start"){
       if(cash["trst"]===1){
-        return message.reply(`この機能は https://discord.com/channels/${message.guild.id}/${cash["msgch"]} で利用されています。`)
+        return message.reply(`This feature is being used in https://discord.com/channels/${message.guild.id}/${cash["msgch"]}`)
       }
       var FilePath = "./settings.json";
       var Structure = JSON.parse(fs.readFileSync(FilePath));
@@ -82,7 +82,7 @@ client.on("messageCreate", async (message) => {
       fs.writeFileSync(FilePath, JSON.stringify(Structure));
       cash["trst"]=1
       cash["msgch"]=message.channel.id
-      return message.reply("enable automatic translation")
+  return message.reply("Automatic translation enabled")
     }
     if(command==="stop"){
       if(cash["trst"]===0){
@@ -98,7 +98,7 @@ client.on("messageCreate", async (message) => {
       fs.writeFileSync(FilePath, JSON.stringify(Structure));
       cash["trst"]=0
       cash["msgch"]=0
-      return message.reply("stop translation")
+  return message.reply("Automatic translation stopped")
     }
     if(command==="help"){
         return message.channel.send({
@@ -107,26 +107,26 @@ client.on("messageCreate", async (message) => {
           author: {
             name: client.user.name,
           },
-          title: `help[${prefix}]`,
+          title: "help[" + prefix + "]",
           fields: [
                 {
                   name: "start",
-                  value: `送信されたチャンネルで自動翻訳を開始します。`,
+                  value: "Start automatic translation in the channel where the command is sent.",
                   inline:true
                 },
                 {
                   name: "stop",
-                  value: `メッセージ自動翻訳機能を停止します。`,
+                  value: "Stop automatic message translation feature.",
                   inline:true
                 },
                 {
-                  name: "tr [言語] [本文]",
-                  value: `メッセージを翻訳します。\n対応言語は[こちら](https://developers.google.com/admin-sdk/directory/v1/)`,
-                  inline:false
+                  name: "tr [language] [text]",
+                  value: "Translate a message.\nSupported languages are [here](https://developers.google.com/admin-sdk/directory/v1/)",
+                  inline: false
                 }
               ],
           footer: {
-            text: "made by maka_7264 ©2023-2024 maka_7264", //適宜変えてください。
+            text: "made by maka_7264 ©2023-2024 maka_7264", //Change as needed.
           },
           timestamp: new Date(),
         },
@@ -137,83 +137,90 @@ client.on("messageCreate", async (message) => {
       if(message.content.startsWith(prefix)){
         return
       }//prefixが含まれてたら翻訳しない
-      const nickname = message.member.displayName; //webhookのauthorname
-      const avatarURL = message.author.avatarURL({dynamic : true}); //webhookのavatar(URLで指定)
+  const nickname = message.member.displayName; //webhook author name
+  const avatarURL = message.author.avatarURL({dynamic : true}); //webhook avatar (specified by URL)
       const webhook = await getWebhookInChannel(message.channel);
       if(cash["trst"]===1){
         if(message.channel.id===cash["msgch"]){
-          if(message.mentions.members.size > 0){
-            var mentionmember = message.mentions.members.first() //メンションされた最初の人を取得
-            var trtext = message.content.replace(`<@${mentionmember.user.id}>`,"") //さっき取得したメンションを置き換え(複数メンション非対応(改善の余地あり))
-          }else{
-            var trtext = message.content
+          let trtext;
+          if (message.mentions.members.size > 0) {
+            const mentionmember = message.mentions.members.first(); // Get the first mentioned member
+            trtext = message.content.replace(`<@${mentionmember.user.id}>`, ""); // Replace the mention (does not support multiple mentions, can be improved)
+          } else {
+            trtext = message.content;
           }
-          try{
-              var jares = await fetch(`https://script.google.com/macros/s/AKfycbyZzeACcCpM2PNgoYN1jg64CTzZcXCx-xYHp9WC6yNQYdrCmyYcER-_vR8A-D2Epvok_w/exec?text=${trtext}&source=&target=${encodeURIComponent("ja")}`).then(res => res.text())
-              var enres = await fetch(`https://script.google.com/macros/s/AKfycbyZzeACcCpM2PNgoYN1jg64CTzZcXCx-xYHp9WC6yNQYdrCmyYcER-_vR8A-D2Epvok_w/exec?text=${trtext}&source=&target=${encodeURIComponent("en")}`).then(res => res.text())
-    if(jares==="[リンク省略]"){
-      return
-    } //もしリンクのみの場合、Google Apps Scriptでリンクを[リンク省略]に置き換えてるので、リンク省略のみが返された場合はメッセージ送信しない(複数リンク非対応)
-    if(message.content===""){
-      return
-    } //送信されたものが画像だけだったりファイルだけの場合翻訳しない。
-    if(jares===""){
-      return
-    } //さっきと同じ(あまり意味ない。)
-    if(enres===""){
-      return
-    } //さっきと同じ(あまり意味ない。)
-    if(jares===enres){
-      return
-    } //絵文字とか除外(完全ではない。)
-    if(jares.match('<H1>Bad Request</H1>')){
-      return await webhook.send({
-     content : `Cannot translate.`,
-     username : `Error`,
-     avatarURL : avatarURL,
-   })
-    } //翻訳でエラーが出た場合除外
-    if(jares.match('<title>Error</title>')){
-      return await webhook.send({
-     content : `Cannot translate.`,
-     username : `Error`,
-     avatarURL : avatarURL,
-   })
-   } //翻訳でエラーが出た場合除外(こっちだけでいい感あり)
-   //もっといい例外処理の書き方あると思う
-    const translatemsg = await webhook.send({
-     content : `...`,//とりあえずwebhookの送信(翻訳apiの返答に600msぐらいかかるため)
-     username : `from: ${nickname}`,
-     avatarURL : avatarURL,
-   })
-    trmsgid[message.id]=translatemsg.id //キャッシュに保存(ファイルに保存してもいいけど活発なサーバーだと読み込み遅くなると思う。)
-    webhook.editMessage(translatemsg.id,`ja: ${jares}\nen: ${enres}`)//さっき送信したwebhookの編集
-    }catch(err){console.error(err)}}//エラー出たらコンソールに出力
-    }}
-  })
-client.on('messageDelete', async message => { //メッセージ削除検知的な
-   if (!message.guild) return //メッセージ削除されたのがサーバーじゃなければ除外
-  if(trmsgid[message.id]===undefined){ //キャッシュに削除されたメッセージのidがなければ除外
+          try {
+            const jares = await fetch('https://script.google.com/macros/s/AKfycbyZzeACcCpM2PNgoYN1jg64CTzZcXCx-xYHp9WC6yNQYdrCmyYcER-_vR8A-D2Epvok_w/exec?text=' + encodeURIComponent(trtext) + '&source=&target=' + encodeURIComponent('ja')).then(res => res.text());
+            const enres = await fetch('https://script.google.com/macros/s/AKfycbyZzeACcCpM2PNgoYN1jg64CTzZcXCx-xYHp9WC6yNQYdrCmyYcER-_vR8A-D2Epvok_w/exec?text=' + encodeURIComponent(trtext) + '&source=&target=' + encodeURIComponent('en')).then(res => res.text());
+            if (jares === '[Link omitted]') {
+              return;
+            }
+            if (message.content === '') {
+              return;
+            }
+            if (jares === '') {
+              return;
+            }
+            if (enres === '') {
+              return;
+            }
+            if (jares === enres) {
+              return;
+            }
+            if (jares.match('<H1>Bad Request</H1>')) {
+              await webhook.send({
+                content: 'Cannot translate.',
+                username: 'Error',
+                avatarURL: avatarURL
+              });
+              return;
+            }
+            if (jares.match('<title>Error</title>')) {
+              await webhook.send({
+                content: 'Cannot translate.',
+                username: 'Error',
+                avatarURL: avatarURL
+              });
+              return;
+            }
+            const translatemsg = await webhook.send({
+              content: '...',
+              username: 'from: ' + nickname,
+              avatarURL: avatarURL
+            });
+            trmsgid[message.id] = translatemsg.id;
+            webhook.editMessage(translatemsg.id, 'ja: ' + jares + '\nen: ' + enres);
+          } catch (err) {
+            console.error(err);
+          }
+        }
+      }
+    }
+});
+
+client.on('messageDelete', async message => { //Detect message deletion
+   if (!message.guild) return //Exclude if deleted message is not from a server
+  if(trmsgid[message.id]===undefined){ //Exclude if deleted message id is not in cache
     return
   }else{
-    await client.channels.cache.get(message.channel.id).messages.cache.get(trmsgid[message.id]).delete() //キャッシュに存在するメッセージidからwebhookで送信したメッセージ取得して削除
+    await client.channels.cache.get(message.channel.id).messages.cache.get(trmsgid[message.id]).delete() //Get and delete the webhook message sent using cached message id
   }
 })
 client.on("interactionCreate", async (interaction) => {
   
   if (!interaction.isCommand()) {
     return;
-  }//ボタン使うならこれの前にコード書く
-  if (interaction.commandName === "ping") {//よくあるやつ(全部ミリ秒)
+  }//If you use buttons, write code before this
+  if (interaction.commandName === "ping") {//Common example (all in milliseconds)
     cash.timestamp0 = Date.now()
     await interaction.deferReply();
     cash.timestamp = Date.now()
     const webhook = await getWebhookInChannel(interaction.channel);
     const msg = await webhook.send({
-     content : `test`,
-     username : `test`,
-     avatarURL : "https://cdn.discordapp.com/avatars/1190995174030053476/0bbe1045e85da9c0aab26f649f0fc0c6.png?size=1024",
-   })
+      content: "test",
+      username: "test",
+      avatarURL: "https://cdn.discordapp.com/avatars/1190995174030053476/0bbe1045e85da9c0aab26f649f0fc0c6.png?size=1024"
+    });
     cash.timestamp1 = Date.now()
     msg
     cash.timestamp2 = Date.now()
@@ -221,14 +228,14 @@ client.on("interactionCreate", async (interaction) => {
     cash.timestamp3 = Date.now()
     await client.channels.cache.get(interaction.channel.id).messages.cache.get(msg.id).delete()
     cash.timestamp4 = Date.now()
-    await fetch(`https://script.google.com/macros/s/AKfycbyZzeACcCpM2PNgoYN1jg64CTzZcXCx-xYHp9WC6yNQYdrCmyYcER-_vR8A-D2Epvok_w/exec?text=${"test"}&source=&target=${encodeURIComponent("ja")}`).then(res => res.text())
+  await fetch('https://script.google.com/macros/s/AKfycbyZzeACcCpM2PNgoYN1jg64CTzZcXCx-xYHp9WC6yNQYdrCmyYcER-_vR8A-D2Epvok_w/exec?text=' + encodeURIComponent('test') + '&source=&target=' + encodeURIComponent('ja')).then(res => res.text());
     cash.timestamp5 = Date.now()
     return await interaction.editReply({
-      content: `EndPoint : ${cash.timestamp0-Date.parse(interaction.createdAt)}(Not so accurate.)\nsendmessage : ${cash.timestamp-cash.timestamp0}\nsendwebhook : ${cash.timestamp3-cash.timestamp}\ndeletemessage : ${cash.timestamp4-cash.timestamp3}\ntranslateapi : ${cash.timestamp5-cash.timestamp4}`,
-      ephemeral: false,
+      content: 'EndPoint : ' + (cash.timestamp0 - Date.parse(interaction.createdAt)) + '(Not so accurate.)\nsendmessage : ' + (cash.timestamp - cash.timestamp0) + '\nsendwebhook : ' + (cash.timestamp3 - cash.timestamp) + '\ndeletemessage : ' + (cash.timestamp4 - cash.timestamp3) + '\ntranslateapi : ' + (cash.timestamp5 - cash.timestamp4),
+      ephemeral: false
     });
   }
-  if (interaction.commandName === "automatictranslation") { //自動翻訳の開始終了
+  if (interaction.commandName === "automatictranslation") { //Start/stop automatic translation
     if(cash["trst"]===1){
         var FilePath = "./settings.json";
       var Structure = JSON.parse(fs.readFileSync(FilePath));
@@ -251,58 +258,62 @@ client.on("interactionCreate", async (interaction) => {
   }
 })
 
-client.on('messageUpdate',async (oldMessage,newMessage) => { //メッセージが編集されたことを検知
-  if(trmsgid[oldMessage.id]===undefined){ //キャッシュにメッセージidなかったら除外
+client.on('messageUpdate',async (oldMessage,newMessage) => { //Detect message edit
+  if(trmsgid[oldMessage.id]===undefined){ //Exclude if message id is not in cache
     return
   }else{
     const webhook = await getWebhookInChannel(oldMessage.channel);
     const translatemsg = trmsgid[oldMessage.id]
-    try{
-              var jares = await fetch(`https://script.google.com/macros/s/AKfycbyZzeACcCpM2PNgoYN1jg64CTzZcXCx-xYHp9WC6yNQYdrCmyYcER-_vR8A-D2Epvok_w/exec?text=${newMessage.content}&source=&target=${encodeURIComponent("ja")}`).then(res => res.text())
-    var enres = await fetch(`https://script.google.com/macros/s/AKfycbyZzeACcCpM2PNgoYN1jg64CTzZcXCx-xYHp9WC6yNQYdrCmyYcER-_vR8A-D2Epvok_w/exec?text=${newMessage.content}&source=&target=${encodeURIComponent("en")}`).then(res => res.text())
-    if(jares==="[リンク省略]"){
-      return
-    } 
-    if(newMessage.content===""){
-      return
+    try {
+      var jares = await fetch('https://script.google.com/macros/s/AKfycbyZzeACcCpM2PNgoYN1jg64CTzZcXCx-xYHp9WC6yNQYdrCmyYcER-_vR8A-D2Epvok_w/exec?text=' + encodeURIComponent(newMessage.content) + '&source=&target=' + encodeURIComponent('ja')).then(res => res.text());
+      var enres = await fetch('https://script.google.com/macros/s/AKfycbyZzeACcCpM2PNgoYN1jg64CTzZcXCx-xYHp9WC6yNQYdrCmyYcER-_vR8A-D2Epvok_w/exec?text=' + encodeURIComponent(newMessage.content) + '&source=&target=' + encodeURIComponent('en')).then(res => res.text());
+      if (jares === '[Link omitted]') {
+        return;
+      }
+      if (newMessage.content === '') {
+        return;
+      }
+      if (jares === '') {
+        return;
+      }
+      if (enres === '') {
+        return;
+      }
+      if (jares.match('<H1>Bad Request</H1>')) {
+        await webhook.editMessage(translatemsg, 'Cannot translate.');
+        return;
+      }
+      if (jares.match('<title>Error</title>')) {
+        await webhook.editMessage(translatemsg, 'Cannot translate.');
+        return;
+      }
+      webhook.editMessage(translatemsg, 'ja: ' + jares + '\nen: ' + enres);
+    } catch (err) {
+      console.error(err);
     }
-    if(jares===""){
-      return
-    }
-    if(enres===""){
-      return
-    }
-    if(jares.match('<H1>Bad Request</H1>')){
-      return await webhook.editMessage(translatemsg,`Cannot translate.`)
-    }
-    if(jares.match('<title>Error</title>')){
-      return await webhook.editMessage(translatemsg,`Cannot translate.`)
-   }
-    webhook.editMessage(translatemsg,`ja: ${jares}\nen: ${enres}`)
-    }catch(err){console.error(err)}
   }
 })
 
 
 if (process.env.DISCORD_BOT_TOKEN == undefined) {
-  console.log("DISCORD_BOT_TOKENが設定されていません。");
+  console.log("DISCORD_BOT_TOKEN is not set.");
   process.exit(0);
 }
 
 client.login(process.env.DISCORD_BOT_TOKEN);
 
 async function getWebhookInChannel(channel) {
-   //webhookのキャッシュを自前で保持し速度向上
+   //Keep webhook cache for speed improvement
    const webhook = cacheWebhooks.get(channel.id) ?? await getWebhook(channel)
    return webhook;
  }
  
- async function getWebhook(channel) {
-   //チャンネル内のWebhookを全て取得
-   const webhooks = await channel.fetchWebhooks();
-   //tokenがある（＝webhook製作者がbot自身）Webhookを取得、なければ作成する
-   const webhook = webhooks?.find((v) => v.token) ?? await channel.createWebhook("Bot Webhook");
-   //キャッシュに入れて次回以降使い回す
-   if (webhook) cacheWebhooks.set(channel.id, webhook);
-   return webhook;
- }
+async function getWebhook(channel) {
+  // Get all webhooks in the channel
+  const webhooks = await channel.fetchWebhooks();
+  // Get webhook with token (created by bot itself), or create if not found
+  const webhook = webhooks?.find((v) => v.token) ?? await channel.createWebhook("Bot Webhook");
+  // Add to cache for reuse
+  if (webhook) cacheWebhooks.set(channel.id, webhook);
+  return webhook;
+}
