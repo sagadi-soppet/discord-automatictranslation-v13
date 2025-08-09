@@ -1,13 +1,13 @@
-# Discord自動翻訳BOT
+# Discord Automatic Translation BOT
 ## discord.js v13
 
-無料無制限の自動翻訳botがなかったので作りました。
-Glitchでの利用を想定してserver.jsの中身を書いてるので、cashがいらないとかあるかもしれません。
-今のところ１つのチャンネルでの自動翻訳しか想定していません。(導入されている全サーバーの中でチャンネル一つだけ)
-気が向いたらアプデします。
-あと、Glitchで使えるNode.jsのバージョンが低いので、各自アップデートしてください。
-パッケージは勝手に入ってはないので各自で手動インストールしておいてください。(要らないパッケージも大量にあるけどネ)
-初心者向けに大量にコメント書いておきました。
-動かすのは難しいかもしれませんが理解はできると思うので学習に使ってください。
-Google Apps Script で作ったapiはmakaが作ったものなので適宜変えてください。変えなくてもAPIに制限はないのでそのまま使用してもらっても特に問題はありませんが、いつまでも動く保証はしません。
+I created this because there wasn't a free, unlimited automatic translation bot available.
+The contents of `server.js` are written with Glitch usage in mind, so you might not need cash or there may be other differences.
+Currently, it only supports automatic translation in one channel. (Only one channel across all servers where it's installed)
+I'll update it if I feel like it.
+Also, since the Node.js version available on Glitch is old, please update it yourself.
+Packages are not installed automatically, so please install them manually. (There are also a lot of unnecessary packages)
+I've added plenty of comments for beginners.
+It might be difficult to run, but I think you can understand it, so feel free to use it for learning.
+The API made with Google Apps Script was created by Maka, so please change it as needed. You can use it as is since there are no restrictions, but there's no guarantee it will always work.
 Licence MIT.
